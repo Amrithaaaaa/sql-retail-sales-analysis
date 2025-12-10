@@ -24,11 +24,11 @@ Answer real-world business questions using SQL queries
 
 🗂️ Database & Table Structure
 Database Creation
-'''sql
+
 CREATE DATABASE p1_retail_db;
-'''
+
 Table Creation
-'''sql
+
 CREATE TABLE retail_sales
 (
     transactions_id INT PRIMARY KEY,
@@ -43,7 +43,7 @@ CREATE TABLE retail_sales
     cogs FLOAT,
     total_sale FLOAT
 );
-'''
+
 🧹 Data Cleaning & Exploration
 1. Basic Exploration
 
@@ -52,64 +52,64 @@ Total records in the dataset
 Total unique customers
 
 Unique product categories
-'''sql
+
 SELECT COUNT(*) FROM retail_sales;
 SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
 SELECT DISTINCT category FROM retail_sales;
-'''
+
 2. Handling Missing Values
 
 Identified records containing NULL values
 
 Removed incomplete records to ensure data quality
-'''sql
+
 DELETE FROM retail_sales
 WHERE 
     sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
     gender IS NULL OR age IS NULL OR category IS NULL OR 
     quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
-'''
+
 📊 Business Analysis & SQL Queries
 
 Below are key business questions answered during this analysis:
 
 1. Sales on a Specific Date
-'''sql
+
 SELECT *
 FROM retail_sales
 WHERE sale_date = '2022-11-05';
-'''
+
 2. Clothing Sales with High Quantity in Nov 2022
-'''sql
+
 SELECT *
 FROM retail_sales
 WHERE category = 'Clothing'
   AND TO_CHAR(sale_date, 'YYYY-MM') = '2022-11'
   AND quantity >= 4;
-'''
+
 3. Total Sales by Category
-'''sql
+
 SELECT 
     category,
     SUM(total_sale) AS total_sales,
     COUNT(*) AS total_orders
 FROM retail_sales
 GROUP BY category;
-'''
+
 4. Average Age of Beauty Category Customers
-'''sql
+
 SELECT ROUND(AVG(age), 2) AS avg_age
 FROM retail_sales
 WHERE category = 'Beauty';
-'''
+
 5. High-Value Transactions
-'''sql
+
 SELECT *
 FROM retail_sales
 WHERE total_sale > 1000;
-'''
+
 6. Transactions by Gender and Category
-'''sql
+
 SELECT 
     category,
     gender,
@@ -117,9 +117,9 @@ SELECT
 FROM retail_sales
 GROUP BY category, gender
 ORDER BY category;
-'''
+
 7. Best Performing Month Each Year (Average Sales)
-'''sql
+
 SELECT year, month, avg_sale
 FROM (
     SELECT 
@@ -134,9 +134,9 @@ FROM (
     GROUP BY 1, 2
 ) t
 WHERE rank = 1;
-'''
+
 8. Top 5 Customers by Total Sales
-'''sql
+
 SELECT 
     customer_id,
     SUM(total_sale) AS total_sales
@@ -144,17 +144,17 @@ FROM retail_sales
 GROUP BY customer_id
 ORDER BY total_sales DESC
 LIMIT 5;
-'''
+
 9. Unique Customers per Category
-'''sql
+
 SELECT 
     category,
     COUNT(DISTINCT customer_id) AS unique_customers
 FROM retail_sales
 GROUP BY category;
-'''
+
 10. Sales by Time Shift
-'''sql
+
 WITH hourly_sales AS (
     SELECT *,
            CASE
@@ -168,7 +168,7 @@ SELECT shift, COUNT(*) AS total_orders
 FROM hourly_sales
 GROUP BY shift;
 
-'''  
+  
 
 Key Insights
 
