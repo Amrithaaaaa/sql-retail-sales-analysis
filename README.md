@@ -1,160 +1,208 @@
-# sql-retail-sales-analysis
+# 🛒 Retail Sales Analysis using SQL
 
-📌 Project Overview
+## 📌 Project Overview
 
-Project Name: Retail Sales Analysis
-Project Level: Beginner
-Database Used: PostgreSQL
-Database Name: sql_project_p1
+**Project Name**: Retail Sales Analysis
+**Project Level**: Beginner
+**Database**: PostgreSQL
+**Database Name**: `sql project p1`
 
-This project focuses on analyzing retail sales data using SQL. It demonstrates core SQL concepts required for an entry-level Data analyst/ Business analyst role, including database creation, data cleaning, exploratory data analysis (EDA), and business-driven querying.
+This project focuses on analyzing retail sales data using SQL. It demonstrates core SQL concepts such as database creation, data cleaning, exploratory data analysis (EDA), and extracting business insights from transactional data.
 
-The objective of this project is to convert raw sales data into meaningful business insights using structured SQL queries.
+---
 
-🎯 Project Objectives
+## 🎯 Project Objectives
 
-Create and manage a retail sales database using SQL
+* Set up a retail sales database
+* Clean and validate raw sales data
+* Perform exploratory data analysis (EDA)
+* Answer business-focused analytical questions using SQL
+* Strengthen proficiency in SQL for data analyst roles
 
-Perform data cleaning by identifying and removing incomplete records
+---
 
-Conduct exploratory data analysis to understand sales patterns
+## 🗂️ Database Setup
 
-Answer real-world business questions using SQL queries
+### Database Creation
 
+```sql
+CREATE DATABASE retail_sales_db;
+```
 
-🗂️ Database & Table Structure
-Database Creation
+### Table Creation
 
-CREATE DATABASE p1_retail_db;
-
-Table Creation
-
-CREATE TABLE retail_sales
-(
+```sql
+CREATE TABLE retail_sales (
     transactions_id INT PRIMARY KEY,
-    sale_date DATE,	
+    sale_date DATE, 
     sale_time TIME,
-    customer_id INT,	
+    customer_id INT, 
     gender VARCHAR(10),
     age INT,
     category VARCHAR(35),
     quantity INT,
-    price_per_unit FLOAT,	
+    price_per_unit FLOAT, 
     cogs FLOAT,
     total_sale FLOAT
 );
+```
 
-🧹 Data Cleaning & Exploration
-1. Basic Exploration
+---
 
-Total records in the dataset
+## 🧹 Data Exploration & Cleaning
 
-Total unique customers
+### Record Count
 
-Unique product categories
+```sql
+SELECT COUNT(*)
+FROM retail_sales;
+```
 
-SELECT COUNT(*) FROM retail_sales;
-SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
-SELECT DISTINCT category FROM retail_sales;
+### Unique Customer Count
 
-2. Handling Missing Values
+```sql
+SELECT COUNT(DISTINCT customer_id)
+FROM retail_sales;
+```
 
-Identified records containing NULL values
+### Unique Product Categories
 
-Removed incomplete records to ensure data quality
+```sql
+SELECT DISTINCT category
+FROM retail_sales;
+```
 
+### Identify NULL Values
+
+```sql
+SELECT *
+FROM retail_sales
+WHERE sale_date IS NULL
+   OR sale_time IS NULL
+   OR customer_id IS NULL
+   OR gender IS NULL
+   OR age IS NULL
+   OR category IS NULL
+   OR quantity IS NULL
+   OR price_per_unit IS NULL
+   OR cogs IS NULL;
+```
+
+### Remove Incomplete Records
+
+```sql
 DELETE FROM retail_sales
-WHERE 
-    sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
-    gender IS NULL OR age IS NULL OR category IS NULL OR 
-    quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
+WHERE sale_date IS NULL
+   OR sale_time IS NULL
+   OR customer_id IS NULL
+   OR gender IS NULL
+   OR age IS NULL
+   OR category IS NULL
+   OR quantity IS NULL
+   OR price_per_unit IS NULL
+   OR cogs IS NULL;
+```
 
-📊 Business Analysis & SQL Queries
+---
 
-Below are key business questions answered during this analysis:
+## 📊 Business Analysis Queries
 
-1. Sales on a Specific Date
+### 1️⃣ Sales on a Specific Date
 
+```sql
 SELECT *
 FROM retail_sales
 WHERE sale_date = '2022-11-05';
+```
 
-2. Clothing Sales with High Quantity in Nov 2022
+### 2️⃣ Clothing Sales (High Quantity – Nov 2022)
 
+```sql
 SELECT *
 FROM retail_sales
 WHERE category = 'Clothing'
   AND TO_CHAR(sale_date, 'YYYY-MM') = '2022-11'
   AND quantity >= 4;
+```
 
-3. Total Sales by Category
+### 3️⃣ Total Sales by Category
 
-SELECT 
-    category,
-    SUM(total_sale) AS total_sales,
-    COUNT(*) AS total_orders
+```sql
+SELECT category,
+       SUM(total_sale) AS total_sales,
+       COUNT(*) AS total_orders
 FROM retail_sales
 GROUP BY category;
+```
 
-4. Average Age of Beauty Category Customers
+### 4️⃣ Average Customer Age (Beauty Category)
 
+```sql
 SELECT ROUND(AVG(age), 2) AS avg_age
 FROM retail_sales
 WHERE category = 'Beauty';
+```
 
-5. High-Value Transactions
+### 5️⃣ High-Value Transactions
 
+```sql
 SELECT *
 FROM retail_sales
 WHERE total_sale > 1000;
+```
 
-6. Transactions by Gender and Category
+### 6️⃣ Transactions by Gender and Category
 
-SELECT 
-    category,
-    gender,
-    COUNT(*) AS total_transactions
+```sql
+SELECT category,
+       gender,
+       COUNT(*) AS total_transactions
 FROM retail_sales
 GROUP BY category, gender
 ORDER BY category;
+```
 
-7. Best Performing Month Each Year (Average Sales)
+### 7️⃣ Best Performing Month Each Year
 
+```sql
 SELECT year, month, avg_sale
 FROM (
-    SELECT 
-        EXTRACT(YEAR FROM sale_date) AS year,
-        EXTRACT(MONTH FROM sale_date) AS month,
-        AVG(total_sale) AS avg_sale,
-        RANK() OVER (
-            PARTITION BY EXTRACT(YEAR FROM sale_date) 
-            ORDER BY AVG(total_sale) DESC
-        ) AS rank
+    SELECT EXTRACT(YEAR FROM sale_date) AS year,
+           EXTRACT(MONTH FROM sale_date) AS month,
+           AVG(total_sale) AS avg_sale,
+           RANK() OVER (
+               PARTITION BY EXTRACT(YEAR FROM sale_date)
+               ORDER BY AVG(total_sale) DESC
+           ) AS rnk
     FROM retail_sales
     GROUP BY 1, 2
 ) t
-WHERE rank = 1;
+WHERE rnk = 1;
+```
 
-8. Top 5 Customers by Total Sales
+### 8️⃣ Top 5 Customers by Total Sales
 
-SELECT 
-    customer_id,
-    SUM(total_sale) AS total_sales
+```sql
+SELECT customer_id,
+       SUM(total_sale) AS total_sales
 FROM retail_sales
 GROUP BY customer_id
 ORDER BY total_sales DESC
 LIMIT 5;
+```
 
-9. Unique Customers per Category
+### 9️⃣ Unique Customers per Category
 
-SELECT 
-    category,
-    COUNT(DISTINCT customer_id) AS unique_customers
+```sql
+SELECT category,
+       COUNT(DISTINCT customer_id) AS unique_customers
 FROM retail_sales
 GROUP BY category;
+```
 
-10. Sales by Time Shift
+### 🔟 Orders by Time Shift
 
+```sql
 WITH hourly_sales AS (
     SELECT *,
            CASE
@@ -164,35 +212,38 @@ WITH hourly_sales AS (
            END AS shift
     FROM retail_sales
 )
-SELECT shift, COUNT(*) AS total_orders
+SELECT shift,
+       COUNT(*) AS total_orders
 FROM hourly_sales
 GROUP BY shift;
+```
 
-  
+---
 
-Key Insights
+## 🔍 Key Insights
 
-Customers belong to diverse age groups with varying purchasing patterns
+* Sales patterns vary significantly across categories and time periods
+* A small group of customers contributes a large share of revenue
+* High-value transactions highlight premium purchasing behavior
+* Sales volume differs across morning, afternoon, and evening shifts
 
-Certain transactions indicate high-value or premium purchases
+---
 
-Monthly trend analysis helps identify peak sales periods
+## 🛠️ Tools & Skills Used
 
-A small group of customers contributes significantly to total revenue
+* PostgreSQL
+* SQL 
+* Data Cleaning & EDA
+* Business Problem Solving
 
-Sales distribution varies across different time shifts
+---
+
+## ✅ Conclusion
+
+This project demonstrates practical SQL skills for data analysis, including database design, data cleaning, and extracting insights to support business decisions. It serves as a strong portfolio project for entry-level data analyst / business analyst roles.
+
+---
 
 
-✅ Conclusion
 
-This project demonstrates my ability to:
-
-Design and manage relational databases
-
-Clean and prepare data for analysis
-
-Apply SQL to answer real-world business questions
-
-Extract actionable insights from raw transactional data
-
-It serves as a strong foundation project for aspiring data analysts and showcases practical SQL skills relevant to entry-level roles.
+📌 This project is part of my data analytics / business analytics portfolio and reflects hands-on SQL learning.
